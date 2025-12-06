@@ -76,22 +76,19 @@
             50% { transform: translateY(-10px); }
         }
 
-        .input-group:focus-within label { color: #2563eb; }
-        .input-group:focus-within i { color: #2563eb; }
+        .input-group:focus-within label {
+            color: #2563eb;
+        }
+        
+        .input-group:focus-within i {
+            color: #2563eb;
+        }
 
         /* تأثيرات عامة */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
-        
-        .table-header-custom th { 
-            background-color: #1e40af; 
-            color: white; 
-            border: 1px solid #1e3a8a; 
-            padding: 12px; 
-            text-align: center; 
-            font-weight: 700; 
-        }
+        .table-header-custom th { background-color: #1e40af; color: white; border: 1px solid #1e3a8a; padding: 12px; text-align: center; font-weight: 700; }
         
         .stat-card {
             transition: all 0.3s ease;
@@ -101,92 +98,33 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
-        /* ----------------------------------------------------
-           🔥🔥 السحر هنا: تحويل الجدول لبطاقات على الموبايل 🔥🔥
-        ---------------------------------------------------- */
+        /* --- تحسينات خاصة بالموبايل (Responsive) --- */
         @media (max-width: 768px) {
-            /* 1. إجبار الجدول وعناصره على التصرف كـ Block وليس Table */
-            table, thead, tbody, th, td, tr { 
-                display: block; 
-                width: 100%;
-            }
-            
-            /* 2. إخفاء رأس الجدول الأصلي (لأنه لا فائدة منه في نظام البطاقات) */
-            thead tr { 
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-            
-            /* 3. تحويل الصف (TR) إلى بطاقة أنيقة */
-            tr { 
-                border: 1px solid #e2e8f0; 
-                margin-bottom: 1rem; 
-                border-radius: 1rem; /* حواف دائرية */
-                background-color: white;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* ظل خفيف */
-                padding: 0;
-                overflow: hidden;
-            }
-            
-            /* 4. تنسيق الخلايا (TD) لتظهر كسطور */
-            td { 
-                border: none !important;
-                border-bottom: 1px solid #f1f5f9 !important; 
-                position: relative;
-                padding-right: 40% !important; /* ترك مساحة لاسم العمود */
-                padding-left: 1rem !important;
-                padding-top: 0.75rem !important;
-                padding-bottom: 0.75rem !important;
-                text-align: left !important; /* محاذاة القيمة لليسار */
-                min-height: 45px;
-                display: flex;
-                align-items: center;
-                justify-content: flex-end; /* القيمة تذهب لليسار */
-            }
-            
-            td:last-child { 
-                border-bottom: none !important; 
-            }
-            
-            /* 5. وضع اسم العمود (مثل: التهمة) على اليمين باستخدام data-label */
-            td::before { 
-                content: attr(data-label); /* يأخذ الاسم من الجافاسكريبت */
-                position: absolute;
-                right: 1rem;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 35%; 
-                white-space: nowrap;
-                font-weight: 800;
-                color: #1e3a8a; /* لون أزرق غامق للعنوان */
-                text-align: right;
-            }
-
-            /* 6. تمييز "رقم المسلسل" كشريط علوي للبطاقة */
-            td[data-label="م"] {
-                background: linear-gradient(to left, #eff6ff, #ffffff);
-                margin: 0;
-                padding: 0.75rem 1rem !important;
-                border-bottom: 2px solid #bfdbfe !important;
-                justify-content: space-between;
-                padding-right: 1rem !important;
-            }
-            td[data-label="م"]::before {
-                position: static;
-                transform: none;
-                width: auto;
-                content: "سجل رقم #"; /* تغيير كلمة "م" إلى شيء أوضح */
-            }
-
-            /* تحسين الأزرار العلوية */
+            /* تعديل الأزرار العلوية لتلتف وتأخذ مساحة مناسبة */
             .header-buttons {
                 flex-wrap: wrap;
                 justify-content: center;
-                gap: 5px;
+                gap: 0.5rem;
+                width: 100%;
             }
             .header-buttons button {
-                flex: 1 1 45%; /* زرين في كل صف */
+                flex-grow: 1; /* الأزرار تأخذ مساحة متساوية */
+                justify-content: center;
+                min-width: 80px;
+            }
+            /* جعل الجدول قابل للتمرير بسلاسة */
+            .table-container {
+                -webkit-overflow-scrolling: touch;
+            }
+            /* تعديل الهيدر ليصبح عمودي */
+            .main-header-content {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .main-header-text {
+                text-align: center;
+                margin-top: 0.5rem;
             }
         }
 
@@ -195,13 +133,8 @@
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             body { background-color: white; }
-            /* استعادة الجدول عند الطباعة */
-            table, thead, tbody, th, td, tr { display: table-row-group; }
-            thead { display: table-header-group; }
-            tr { display: table-row; box-shadow: none; border: 1px solid #000; margin: 0; border-radius: 0; }
-            td { display: table-cell; padding: 5px !important; border: 1px solid #000 !important; text-align: center !important; }
-            td::before { display: none; }
-            table { width: 100% !important; border-collapse: collapse; }
+            table { width: 100% !important; border: 1px solid #000; }
+            th, td { border: 1px solid #000 !important; padding: 5px; }
             footer { display: none !important; }
         }
     </style>
@@ -210,8 +143,10 @@
 <body class="bg-background text-slate-800 antialiased min-h-screen flex flex-col">
 
     <div id="loginOverlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4">
+        
         <div class="glass-card w-[90%] md:w-full max-w-md rounded-3xl p-6 md:p-10 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+
             <div class="text-center mb-8">
                 <div class="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-full flex items-center justify-center mx-auto shadow-xl mb-4 border-4 border-white">
                     <i class="fa-solid fa-scale-balanced fa-2x md:fa-3x"></i>
@@ -219,62 +154,85 @@
                 <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-2">نظام إدارة القضايا</h1>
                 <p class="text-slate-500 font-medium text-sm">نيابة ابوقرقاص الجزئية</p>
             </div>
+            
             <form onsubmit="handleLogin(event)" class="space-y-5">
                 <div class="input-group relative">
                     <label class="block text-xs font-bold text-slate-500 mb-1 mr-1">اسم المستخدم</label>
                     <div class="relative">
                         <i class="fa-solid fa-user absolute right-4 top-3.5 text-slate-400 transition-colors"></i>
-                        <input type="text" id="loginUser" required placeholder="أدخل اسم المستخدم" class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-semibold text-slate-700">
+                        <input type="text" id="loginUser" required placeholder="أدخل اسم المستخدم"
+                            class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-semibold text-slate-700">
                     </div>
                 </div>
+                
                 <div class="input-group relative">
                     <label class="block text-xs font-bold text-slate-500 mb-1 mr-1">كلمة المرور</label>
                     <div class="relative">
                         <i class="fa-solid fa-lock absolute right-4 top-3.5 text-slate-400 transition-colors"></i>
-                        <input type="password" id="loginPass" required placeholder="••••••••" class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-semibold text-slate-700">
+                        <input type="password" id="loginPass" required placeholder="••••••••"
+                            class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-semibold text-slate-700">
                     </div>
                 </div>
-                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-blue-700 to-blue-600 text-white rounded-xl font-bold hover:from-blue-800 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30 transform hover:-translate-y-1 active:translate-y-0 text-lg flex items-center justify-center gap-2">
+
+                <button type="submit" 
+                    class="w-full py-3.5 bg-gradient-to-r from-blue-700 to-blue-600 text-white rounded-xl font-bold hover:from-blue-800 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30 transform hover:-translate-y-1 active:translate-y-0 text-lg flex items-center justify-center gap-2">
                     <span>تسجيل الدخول</span>
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
             </form>
         </div>
+
         <div class="mt-8 text-center z-10 opacity-80 hover:opacity-100 transition-opacity px-4">
             <p class="text-white/60 text-xs font-light tracking-wide">DESIGNED & DEVELOPED BY</p>
-            <h3 class="text-white text-base md:text-lg font-bold mt-1 tracking-wider" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Safwat Khalf Abdel Meguid Mehni</h3>
+            <h3 class="text-white text-base md:text-lg font-bold mt-1 tracking-wider" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                Safwat Khalf Abdel Meguid Mehni
+            </h3>
         </div>
     </div>
 
     <div id="mainContent" class="hidden flex flex-col min-h-screen">
         <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200 transition-all duration-300 no-print">
-            <div class="container mx-auto px-4 md:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="container mx-auto px-4 md:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 main-header-content">
                 <div class="flex items-center gap-4 w-full md:w-auto justify-center md:justify-start">
                     <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30 shrink-0">
                         <i class="fa-solid fa-scale-balanced fa-xl"></i>
                     </div>
-                    <div class="text-center md:text-right">
+                    <div class="main-header-text md:text-right">
                         <h1 class="text-lg md:text-xl font-bold text-slate-800 tracking-wide">نظام إدارة القضايا الإحصائي</h1>
                         <p class="text-[10px] md:text-[11px] text-slate-500 font-medium">النيابة العامة - نيابة ابوقرقاص الجزئية</p>
                     </div>
                 </div>
+
                 <div class="flex gap-2 items-center header-buttons w-full md:w-auto">
-                    <button id="adminBtn" onclick="openUserModal()" class="hidden px-3 md:px-4 py-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 font-bold text-xs transition border border-purple-200 flex items-center gap-2">
+                    <button id="adminBtn" onclick="openUserModal()"
+                        class="hidden px-3 md:px-4 py-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 font-bold text-xs transition border border-purple-200 flex items-center gap-2">
                         <i class="fa-solid fa-users-gear"></i> <span class="hidden sm:inline">المستخدمين</span>
                     </button>
+
                     <div class="hidden md:block h-8 w-px bg-slate-200 mx-1"></div>
-                    <button onclick="backupData()" class="px-3 md:px-4 py-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-bold text-xs transition border border-emerald-200 flex items-center gap-2" title="حفظ نسخة احتياطية">
+
+                    <button onclick="backupData()"
+                        class="px-3 md:px-4 py-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-bold text-xs transition border border-emerald-200 flex items-center gap-2"
+                        title="حفظ نسخة احتياطية">
                         <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">نسخ</span>
                     </button>
-                    <button onclick="triggerRestore()" class="px-3 md:px-4 py-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 font-bold text-xs transition border border-orange-200 flex items-center gap-2" title="استرجاع">
+
+                    <button onclick="triggerRestore()"
+                        class="px-3 md:px-4 py-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 font-bold text-xs transition border border-orange-200 flex items-center gap-2"
+                        title="استرجاع">
                         <i class="fa-solid fa-rotate-left"></i> <span class="hidden sm:inline">استعادة</span>
                     </button>
                     <input type="file" id="restoreInput" accept=".json" style="display: none;" onchange="handleRestoreFile(this)">
+
                     <div class="hidden md:block h-8 w-px bg-slate-200 mx-1"></div>
-                    <button onclick="resetSystem()" class="px-3 md:px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs transition border border-red-200 flex items-center gap-2">
+
+                    <button onclick="resetSystem()"
+                        class="px-3 md:px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs transition border border-red-200 flex items-center gap-2">
                         <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">مسح</span>
                     </button>
-                    <button onclick="logout()" class="px-3 md:px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 font-bold text-xs transition border border-slate-700 flex items-center gap-2 ml-2">
+
+                    <button onclick="logout()"
+                        class="px-3 md:px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 font-bold text-xs transition border border-slate-700 flex items-center gap-2 ml-2">
                         <i class="fa-solid fa-right-from-bracket"></i> خروج
                     </button>
                 </div>
@@ -282,6 +240,7 @@
         </header>
 
         <main class="flex-grow container mx-auto p-4 md:p-6 space-y-6">
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
                 <div class="stat-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
@@ -292,6 +251,7 @@
                         <i class="fa-solid fa-folder-open fa-lg"></i>
                     </div>
                 </div>
+
                 <div class="stat-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
                         <p class="text-xs font-bold text-slate-500 mb-1">قضايا <span id="currentYearLabel">2025</span></p>
@@ -301,6 +261,7 @@
                         <i class="fa-solid fa-calendar-day fa-lg"></i>
                     </div>
                 </div>
+
                 <div class="stat-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
                         <p class="text-xs font-bold text-slate-500 mb-1">تم التصرف فيها</p>
@@ -310,6 +271,7 @@
                         <i class="fa-solid fa-check-double fa-lg"></i>
                     </div>
                 </div>
+
                 <div class="stat-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
                         <p class="text-xs font-bold text-slate-500 mb-1">قيد التحقيق / المتابعة</p>
@@ -327,7 +289,9 @@
                         <h2 class="text-lg font-bold text-slate-800">سجل القضايا</h2>
                         <p class="text-sm text-slate-500">إدارة ومتابعة القضايا المسجلة</p>
                     </div>
-                    <button onclick="openAddModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-blue-500/20 transform hover:-translate-y-0.5">
+
+                    <button onclick="openAddModal()"
+                        class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-blue-500/20 transform hover:-translate-y-0.5">
                         <i class="fa-solid fa-plus"></i> إضافة قضية جديدة
                     </button>
                 </div>
@@ -336,10 +300,12 @@
                     <div class="md:col-span-4">
                         <label class="block text-xs font-bold text-slate-600 mb-1.5">بحث في الجدول</label>
                         <div class="relative">
-                            <input type="text" id="searchInput" onkeyup="performSearch()" placeholder="بحث..." class="w-full pl-4 pr-10 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm outline-none">
+                            <input type="text" id="searchInput" onkeyup="performSearch()" placeholder="بحث..."
+                                class="w-full pl-4 pr-10 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm outline-none">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
                         </div>
                     </div>
+                    
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-slate-600 mb-1.5">من تاريخ</label>
                         <input type="date" id="dateFrom" onchange="performSearch()" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm outline-none">
@@ -348,11 +314,13 @@
                         <label class="block text-xs font-bold text-slate-600 mb-1.5">إلى تاريخ</label>
                         <input type="date" id="dateTo" onchange="performSearch()" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm outline-none">
                     </div>
+                    
                     <div class="md:col-span-1">
                         <button onclick="performSearch()" class="w-full py-2.5 bg-slate-800 text-white hover:bg-slate-900 rounded-lg text-sm font-bold shadow-sm transition flex items-center justify-center gap-2">
                             <i class="fa-solid fa-filter"></i>
                         </button>
                     </div>
+                    
                     <div class="md:col-span-3 flex justify-end gap-2 overflow-x-auto pb-1 md:pb-0 header-buttons">
                         <button onclick="openColumnModal()" class="px-3 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-xs font-bold shadow-sm flex items-center gap-2">
                             <i class="fa-solid fa-table-columns"></i> أعمدة
@@ -391,7 +359,9 @@
         </main>
 
         <footer class="py-6 text-center border-t border-slate-200 mt-auto bg-white no-print">
-            <p class="text-xs text-slate-400 font-medium">Designed by <span class="text-slate-600 font-bold">Safwat Khalf Abdel Meguid Mehni</span></p>
+            <p class="text-xs text-slate-400 font-medium">
+                Designed by <span class="text-slate-600 font-bold">Safwat Khalf Abdel Meguid Mehni</span>
+            </p>
         </footer>
     </div>
 
@@ -451,6 +421,7 @@
                         </div>
                         <button onclick="createUser()" class="w-full py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition">إنشاء الحساب</button>
                     </div>
+                    
                     <div class="mt-6">
                         <h4 class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">المستخدمين الحاليين</h4>
                         <ul id="userList" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></ul>
@@ -475,9 +446,11 @@
         const STORAGE_KEY_DATA = 'cases_app_data_custom';
         const STORAGE_KEY_USERS = 'cases_app_users';
         const SESSION_KEY_LOGIN = 'cases_app_logged_in';
+        
         const ADMIN_USER = 'esla.m.ali';
         const ADMIN_PASS = '552014';
 
+        // --- Auth & Init ---
         window.addEventListener('DOMContentLoaded', () => {
             checkLoginStatus();
             loadFromStorage();
@@ -505,12 +478,15 @@
             e.preventDefault();
             const u = document.getElementById('loginUser').value.trim();
             const p = document.getElementById('loginPass').value.trim();
+            
             if (u === ADMIN_USER && p === ADMIN_PASS) {
                 loginSuccess(u);
                 return;
             }
+
             const users = getUsers();
             const user = users.find(usr => usr.username === u && usr.password === p);
+
             if (user) {
                 loginSuccess(u);
             } else {
@@ -532,6 +508,7 @@
             window.location.reload();
         }
 
+        // --- User Management (Admin Only) ---
         function getUsers() {
             const stored = localStorage.getItem(STORAGE_KEY_USERS);
             return stored ? JSON.parse(stored) : [];
@@ -541,6 +518,7 @@
             const users = getUsers();
             const list = document.getElementById('userList');
             list.innerHTML = '';
+            
             if(users.length === 0) {
                 list.innerHTML = '<li class="text-xs text-slate-400 text-center py-2">لا يوجد مستخدمين إضافيين</li>';
             } else {
@@ -564,12 +542,16 @@
         function createUser() {
             const u = document.getElementById('newUsername').value.trim();
             const p = document.getElementById('newPassword').value.trim();
+
             if (!u || !p) return Swal.fire('تنبيه', 'يرجى ملء جميع الحقول', 'warning');
             if (u === ADMIN_USER) return Swal.fire('خطأ', 'لا يمكن استخدام اسم الأدمن', 'error');
+
             const users = getUsers();
             if (users.find(usr => usr.username === u)) return Swal.fire('خطأ', 'اسم المستخدم موجود مسبقاً', 'error');
+
             users.push({username: u, password: p});
             localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+            
             document.getElementById('newUsername').value = '';
             document.getElementById('newPassword').value = '';
             openUserModal();
@@ -596,6 +578,7 @@
             });
         }
 
+        // --- Data Logic ---
         document.getElementById('excelInput').addEventListener('change', handleFileSelect, false);
 
         function saveToStorage() { localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(globalData)); }
@@ -615,6 +598,7 @@
             const dataset = filteredData;
             const total = dataset.length;
             const currentYear = new Date().getFullYear();
+            
             document.getElementById('currentYearLabel').innerText = currentYear;
             const thisYearCount = dataset.filter(row => row['سنة القضية'] == currentYear).length;
             const disposedCount = dataset.filter(row => {
@@ -622,6 +606,7 @@
                 return val && String(val).trim() !== ""; 
             }).length;
             const pendingCount = total - disposedCount;
+
             document.getElementById('statTotal').innerText = total;
             document.getElementById('statCurrentYear').innerText = thisYearCount;
             document.getElementById('statDisposed').innerText = disposedCount;
@@ -789,10 +774,6 @@
                 visibleColumns.forEach(header => {
                     const td = document.createElement('td');
                     td.className = "p-3 border-l border-slate-100 last:border-l-0 text-slate-700 whitespace-nowrap";
-                    
-                    // --- إضافة اسم العمود كخاصية لاستخدامها في الـ CSS للموبايل ---
-                    td.setAttribute('data-label', header);
-
                     let val = row[header] || "";
                     if (header === 'م') {
                         val = index + 1;
