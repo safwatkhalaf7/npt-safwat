@@ -76,19 +76,22 @@
             50% { transform: translateY(-10px); }
         }
 
-        .input-group:focus-within label {
-            color: #2563eb;
-        }
-        
-        .input-group:focus-within i {
-            color: #2563eb;
-        }
+        .input-group:focus-within label { color: #2563eb; }
+        .input-group:focus-within i { color: #2563eb; }
 
         /* تأثيرات عامة */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
-        .table-header-custom th { background-color: #1e40af; color: white; border: 1px solid #1e3a8a; padding: 12px; text-align: center; font-weight: 700; }
+        
+        .table-header-custom th { 
+            background-color: #1e40af; 
+            color: white; 
+            border: 1px solid #1e3a8a; 
+            padding: 12px; 
+            text-align: center; 
+            font-weight: 700; 
+        }
         
         .stat-card {
             transition: all 0.3s ease;
@@ -98,9 +101,12 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
-        /* --- تحسينات خاصة بالموبايل (Responsive) --- */
+        /* ----------------------------------------------------
+           تحسينات الموبايل (Responsive Table & Layout)
+           هذا هو الجزء المسؤول عن تحويل الجدول إلى بطاقات
+        ---------------------------------------------------- */
         @media (max-width: 768px) {
-            /* تعديل الأزرار العلوية لتلتف وتأخذ مساحة مناسبة */
+            /* تعديل الأزرار العلوية */
             .header-buttons {
                 flex-wrap: wrap;
                 justify-content: center;
@@ -108,23 +114,84 @@
                 width: 100%;
             }
             .header-buttons button {
-                flex-grow: 1; /* الأزرار تأخذ مساحة متساوية */
+                flex-grow: 1;
                 justify-content: center;
-                min-width: 80px;
+                min-width: 45%; /* زرين في كل صف */
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
             }
-            /* جعل الجدول قابل للتمرير بسلاسة */
-            .table-container {
-                -webkit-overflow-scrolling: touch;
+
+            /* --- تحويل الجدول إلى بطاقات --- */
+            table, thead, tbody, th, td, tr { 
+                display: block; 
             }
-            /* تعديل الهيدر ليصبح عمودي */
-            .main-header-content {
-                flex-direction: column;
+            
+            /* إخفاء رأس الجدول الأصلي */
+            thead tr { 
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            /* تنسيق الصف (البطاقة) */
+            tr { 
+                border: 1px solid #e2e8f0; 
+                margin-bottom: 1rem; 
+                border-radius: 1rem;
+                background-color: white;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                padding: 0.5rem;
+                overflow: hidden;
+            }
+            
+            /* تنسيق الخلايا داخل البطاقة */
+            td { 
+                border: none !important;
+                border-bottom: 1px solid #f1f5f9 !important; 
+                position: relative;
+                padding-right: 50% !important; /* مساحة للعنوان */
+                padding-left: 1rem !important;
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+                text-align: left !important; /* القيمة على اليسار */
+                min-height: 45px;
+                display: flex;
                 align-items: center;
-                text-align: center;
+                justify-content: flex-end;
             }
-            .main-header-text {
-                text-align: center;
-                margin-top: 0.5rem;
+            
+            td:last-child { 
+                border-bottom: none !important; 
+            }
+            
+            /* وضع عنوان العمود (data-label) على اليمين */
+            td::before { 
+                content: attr(data-label);
+                position: absolute;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 45%; 
+                white-space: nowrap;
+                font-weight: 700;
+                color: #1e3a8a; /* لون أزرق غامق للعنوان */
+                text-align: right;
+            }
+
+            /* تنسيق خاص لعمود المسلسل ليظهر كشريط علوي للبطاقة */
+            td[data-label="م"] {
+                background-color: #f8fafc;
+                margin: -0.5rem -0.5rem 0.5rem -0.5rem;
+                padding: 0.5rem 1rem !important;
+                border-bottom: 2px solid #e2e8f0 !important;
+                justify-content: space-between;
+                padding-right: 1rem !important;
+            }
+            td[data-label="م"]::before {
+                position: static;
+                transform: none;
+                width: auto;
+                content: "سجل رقم:";
             }
         }
 
@@ -133,8 +200,13 @@
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             body { background-color: white; }
-            table { width: 100% !important; border: 1px solid #000; }
-            th, td { border: 1px solid #000 !important; padding: 5px; }
+            /* استعادة شكل الجدول الطبيعي عند الطباعة */
+            table, thead, tbody, th, td, tr { display: table-row-group; }
+            thead { display: table-header-group; }
+            tr { display: table-row; box-shadow: none; border: 1px solid #000; margin: 0; border-radius: 0; }
+            td { display: table-cell; padding: 5px !important; border: 1px solid #000 !important; text-align: center !important; }
+            td::before { display: none; }
+            table { width: 100% !important; border-collapse: collapse; }
             footer { display: none !important; }
         }
     </style>
@@ -192,12 +264,12 @@
 
     <div id="mainContent" class="hidden flex flex-col min-h-screen">
         <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200 transition-all duration-300 no-print">
-            <div class="container mx-auto px-4 md:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 main-header-content">
+            <div class="container mx-auto px-4 md:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4 w-full md:w-auto justify-center md:justify-start">
                     <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30 shrink-0">
                         <i class="fa-solid fa-scale-balanced fa-xl"></i>
                     </div>
-                    <div class="main-header-text md:text-right">
+                    <div class="text-center md:text-right">
                         <h1 class="text-lg md:text-xl font-bold text-slate-800 tracking-wide">نظام إدارة القضايا الإحصائي</h1>
                         <p class="text-[10px] md:text-[11px] text-slate-500 font-medium">النيابة العامة - نيابة ابوقرقاص الجزئية</p>
                     </div>
@@ -205,34 +277,34 @@
 
                 <div class="flex gap-2 items-center header-buttons w-full md:w-auto">
                     <button id="adminBtn" onclick="openUserModal()"
-                        class="hidden px-3 md:px-4 py-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 font-bold text-xs transition border border-purple-200 flex items-center gap-2">
-                        <i class="fa-solid fa-users-gear"></i> <span class="hidden sm:inline">المستخدمين</span>
+                        class="hidden px-3 py-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 font-bold text-xs transition border border-purple-200 flex items-center gap-2">
+                        <i class="fa-solid fa-users-gear"></i> <span>المستخدمين</span>
                     </button>
 
                     <div class="hidden md:block h-8 w-px bg-slate-200 mx-1"></div>
 
                     <button onclick="backupData()"
-                        class="px-3 md:px-4 py-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-bold text-xs transition border border-emerald-200 flex items-center gap-2"
+                        class="px-3 py-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-bold text-xs transition border border-emerald-200 flex items-center gap-2"
                         title="حفظ نسخة احتياطية">
-                        <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">نسخ</span>
+                        <i class="fa-solid fa-download"></i> <span>نسخ</span>
                     </button>
 
                     <button onclick="triggerRestore()"
-                        class="px-3 md:px-4 py-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 font-bold text-xs transition border border-orange-200 flex items-center gap-2"
+                        class="px-3 py-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 font-bold text-xs transition border border-orange-200 flex items-center gap-2"
                         title="استرجاع">
-                        <i class="fa-solid fa-rotate-left"></i> <span class="hidden sm:inline">استعادة</span>
+                        <i class="fa-solid fa-rotate-left"></i> <span>استعادة</span>
                     </button>
                     <input type="file" id="restoreInput" accept=".json" style="display: none;" onchange="handleRestoreFile(this)">
 
                     <div class="hidden md:block h-8 w-px bg-slate-200 mx-1"></div>
 
                     <button onclick="resetSystem()"
-                        class="px-3 md:px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs transition border border-red-200 flex items-center gap-2">
-                        <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">مسح</span>
+                        class="px-3 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs transition border border-red-200 flex items-center gap-2">
+                        <i class="fa-solid fa-trash-can"></i> <span>مسح</span>
                     </button>
 
                     <button onclick="logout()"
-                        class="px-3 md:px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 font-bold text-xs transition border border-slate-700 flex items-center gap-2 ml-2">
+                        class="px-3 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 font-bold text-xs transition border border-slate-700 flex items-center gap-2 ml-2">
                         <i class="fa-solid fa-right-from-bracket"></i> خروج
                     </button>
                 </div>
@@ -284,6 +356,7 @@
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6 no-print">
+                
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800">سجل القضايا</h2>
@@ -305,7 +378,6 @@
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
                         </div>
                     </div>
-                    
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-slate-600 mb-1.5">من تاريخ</label>
                         <input type="date" id="dateFrom" onchange="performSearch()" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm outline-none">
@@ -314,13 +386,11 @@
                         <label class="block text-xs font-bold text-slate-600 mb-1.5">إلى تاريخ</label>
                         <input type="date" id="dateTo" onchange="performSearch()" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm outline-none">
                     </div>
-                    
                     <div class="md:col-span-1">
                         <button onclick="performSearch()" class="w-full py-2.5 bg-slate-800 text-white hover:bg-slate-900 rounded-lg text-sm font-bold shadow-sm transition flex items-center justify-center gap-2">
                             <i class="fa-solid fa-filter"></i>
                         </button>
                     </div>
-                    
                     <div class="md:col-span-3 flex justify-end gap-2 overflow-x-auto pb-1 md:pb-0 header-buttons">
                         <button onclick="openColumnModal()" class="px-3 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-xs font-bold shadow-sm flex items-center gap-2">
                             <i class="fa-solid fa-table-columns"></i> أعمدة
@@ -450,7 +520,6 @@
         const ADMIN_USER = 'esla.m.ali';
         const ADMIN_PASS = '552014';
 
-        // --- Auth & Init ---
         window.addEventListener('DOMContentLoaded', () => {
             checkLoginStatus();
             loadFromStorage();
@@ -508,7 +577,6 @@
             window.location.reload();
         }
 
-        // --- User Management (Admin Only) ---
         function getUsers() {
             const stored = localStorage.getItem(STORAGE_KEY_USERS);
             return stored ? JSON.parse(stored) : [];
@@ -578,7 +646,6 @@
             });
         }
 
-        // --- Data Logic ---
         document.getElementById('excelInput').addEventListener('change', handleFileSelect, false);
 
         function saveToStorage() { localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(globalData)); }
@@ -774,6 +841,10 @@
                 visibleColumns.forEach(header => {
                     const td = document.createElement('td');
                     td.className = "p-3 border-l border-slate-100 last:border-l-0 text-slate-700 whitespace-nowrap";
+                    
+                    // إضافة السمة data-label لكي تظهر في الموبايل
+                    td.setAttribute('data-label', header);
+
                     let val = row[header] || "";
                     if (header === 'م') {
                         val = index + 1;
