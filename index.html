@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة القضايا الإحصائي - تسجيل الدخول</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e3a8a',
+                        secondary: '#3b82f6',
+                        accent: '#f59e0b',
+                        surface: '#ffffff',
+                        background: '#f8fafc',
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* --- تحسينات شاشة تسجيل الدخول --- */
+        #loginOverlay {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* تأثيرات الخلفية المتحركة */
+        #loginOverlay::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+            animation: rotateBG 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes rotateBG {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            transform: translateY(0);
+            animation: floatCard 6s ease-in-out infinite;
+        }
+
+        @keyframes floatCard {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .input-group:focus-within label {
+            color: #2563eb;
+        }
+
+        .input-group:focus-within i {
+            color: #2563eb;
+        }
+
+        /* تأثيرات عامة */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+
+        .table-header-custom th {
+            background-color: #1e40af;
+            color: white;
+            border: 1px solid #1e3a8a;
+            padding: 12px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        /* الطباعة */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            .print-only {
+                display: block !important;
+            }
+
+            body {
+                background-color: white;
+            }
+
+            table {
+                width: 100% !important;
+                border: 1px solid #000;
+            }
+
+            th,
+            td {
+                border: 1px solid #000 !important;
+                padding: 5px;
+            }
+
+            footer {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-background text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <div id="loginOverlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4">
+
+        <div class="glass-card w-full max-w-md rounded-3xl p-10 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+
+            <div class="text-center mb-8">
+                <div
+                    class="w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-full flex items-center justify-center mx-auto shadow-xl mb-4 border-4 border-white">
+                    <i class="fa-solid fa-scale-balanced fa-3x"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold text-slate-800 mb-2">نظام إدارة القضايا</h1>
+                <p class="text-slate-500 font-medium text-sm">نيابة ابوقرقاص الجزئية</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-5">
+                <div class="input-group relative">
+                    <label class="block text-xs font-bold text-slate-500 mb-1 mr-1">اسم المستخدم</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute right-4 top-3.5 text-slate-400 transition-colors"></i>
+                        <input type="text" id="loginUser" required placeholder="أدخل اسم المستخدم"
+                            class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-semibold text-slate-700">
+                    </div>
+                </div>
+
+                <div class="input-group relative">
+                    <label class="block text-xs font-bold text-slate-500 mb-1 mr-1">كلمة المرور</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute right-4 top-3.5 text-slate-400 transition-colors"></i>
+                        <input type="password" id="loginPass" required placeholder="••••••••"
+                            class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-semibold text-slate-700">
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full py-3.5 bg-gradient-to-r from-blue-700 to-blue-600 text-white rounded-xl font-bold hover:from-blue-800 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30 transform hover:-translate-y-1 active:translate-y-0 text-lg flex items-center justify-center gap-2">
+                    <span>تسجيل الدخول</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="mt-8 text-center z-10 opacity-80 hover:opacity-100 transition-opacity">
+            <p class="text-white/60 text-xs font-light tracking-wide">DESIGNED & DEVELOPED BY</p>
+            <h3 class="text-white text-lg font-bold mt-1 tracking-wider"
+                style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                Safwat Khalf Abdel Meguid Mehni
+            </h3>
+        </div>
+    </div>
+
+    <div id="mainContent" class="hidden flex flex-col min-h-screen">
+        <header
+            class="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200 transition-all duration-300 no-print">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                        <i class="fa-solid fa-scale-balanced fa-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-800 tracking-wide">نظام إدارة القضايا الإحصائي</h1>
+                        <p class="text-[11px] text-slate-500 font-medium">النيابة العامة - نيابة ابوقرقاص الجزئية</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 items-center">
+                    <button id="adminBtn" onclick="openUserModal()"
+                        class="hidden px-4 py-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 font-bold text-xs transition border border-purple-200 flex items-center gap-2">
+                        <i class="fa-solid fa-users-gear"></i> المستخدمين
+                    </button>
+
+                    <div class="h-8 w-px bg-slate-200 mx-1"></div>
+
+                    <button onclick="backupData()"
+                        class="px-4 py-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-bold text-xs transition border border-emerald-200 flex items-center gap-2"
+                        title="حفظ نسخة احتياطية">
+                        <i class="fa-solid fa-download"></i> نسخ احتياطي
+                    </button>
+
+                    <button onclick="triggerRestore()"
+                        class="px-4 py-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 font-bold text-xs transition border border-orange-200 flex items-center gap-2"
+                        title="استرجاع">
+                        <i class="fa-solid fa-rotate-left"></i> استعادة
+                    </button>
+                    <input type="file" id="restoreInput" accept=".json" style="display: none;"
+                        onchange="handleRestoreFile(this)">
+
+                    <div class="h-8 w-px bg-slate-200 mx-1"></div>
+
+                    <button onclick="resetSystem()"
+                        class="px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs transition border border-red-200 flex items-center gap-2">
+                        <i class="fa-solid fa-trash-can"></i> مسح
+                    </button>
+
+                    <button onclick="logout()"
+                        class="px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 font-bold text-xs transition border border-slate-700 flex items-center gap-2 ml-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> خروج
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow container mx-auto p-4 md:p-6 space-y-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
+                <div
+                    class="stat-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 mb-1">القضايا (المعروضة)</p>
+                        <h3 class="text-2xl font-bold text-slate-800" id="statTotal">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-folder-open fa-lg"></i>
+                    </div>
+                </div>
+
+                <div
+                    class="stat-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 mb-1">قضايا <span id="currentYearLabel">2025</span>
+                        </p>
+                        <h3 class="text-2xl font-bold text-slate-800" id="statCurrentYear">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-calendar-day fa-lg"></i>
+                    </div>
+                </div>
+
+                <div
+                    class="stat-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 mb-1">تم التصرف فيها</p>
+                        <h3 class="text-2xl font-bold text-green-600" id="statDisposed">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-check-double fa-lg"></i>
+                    </div>
+                </div>
+
+                <div
+                    class="stat-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 mb-1">قيد التحقيق / المتابعة</p>
+                        <h3 class="text-2xl font-bold text-orange-600" id="statPending">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-hourglass-half fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 no-print">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">سجل القضايا</h2>
+                        <p class="text-sm text-slate-500">إدارة ومتابعة القضايا المسجلة</p>
+                    </div>
+
+                    <button onclick="openAddModal()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition shadow-lg shadow-blue-500/20 transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-plus"></i> إضافة قضية جديدة
+                    </button>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div class="md:col-span-4">
+                        <label class="block text-xs font-bold text-slate-600 mb-1.5">بحث في الجدول</label>
+                        <div class="relative">
+                            <input type="text" id="searchInput" onkeyup="performSearch()" placeholder="بحث..."
+                                class="w-full pl-4 pr-10 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm outline-none">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-600 mb-1.5">من تاريخ</label>
+                        <input type="date" id="dateFrom" onchange="performSearch()"
+                            class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm outline-none">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-600 mb-1.5">إلى تاريخ</label>
+                        <input type="date" id="dateTo" onchange="performSearch()"
+                            class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm outline-none">
+                    </div>
+                    <div class="md:col-span-1">
+                        <button onclick="performSearch()"
+                            class="w-full py-2.5 bg-slate-800 text-white hover:bg-slate-900 rounded-lg text-sm font-bold shadow-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-filter"></i>
+                        </button>
+                    </div>
+                    <div class="md:col-span-3 flex justify-end gap-2">
+                        <button onclick="openColumnModal()"
+                            class="px-3 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-xs font-bold shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-table-columns"></i> أعمدة
+                        </button>
+                        <div class="h-10 w-px bg-slate-300 mx-1"></div>
+                        <button onclick="exportToWord()"
+                            class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 flex items-center justify-center transition">
+                            <i class="fa-solid fa-file-word fa-lg"></i>
+                        </button>
+                        <button onclick="exportToExcel()"
+                            class="w-10 h-10 rounded-lg bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-200 flex items-center justify-center transition">
+                            <i class="fa-solid fa-file-excel fa-lg"></i>
+                        </button>
+                        <button onclick="printTable()"
+                            class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-600 hover:text-white border border-slate-200 flex items-center justify-center transition">
+                            <i class="fa-solid fa-print fa-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto max-h-[600px] table-container relative">
+                    <table id="dataTable" class="w-full text-right border-collapse min-w-[1200px]">
+                        <thead class="sticky top-0 z-20 shadow-md">
+                            <tr id="tableHeader" class="table-header-custom text-sm"></tr>
+                        </thead>
+                        <tbody id="tableBody" class="text-sm text-slate-700 divide-y divide-slate-100 bg-white"></tbody>
+                    </table>
+                </div>
+                <div
+                    class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500 font-medium">
+                    <div id="showingText">عرض 0 سجل</div>
+                    <div class="relative cursor-pointer group">
+                        <span class="text-blue-600 hover:underline group-hover:text-blue-700"><i
+                                class="fa-solid fa-upload"></i> استيراد ملف Excel</span>
+                        <input type="file" id="excelInput" accept=".xlsx, .xls"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-6 text-center border-t border-slate-200 mt-auto bg-white no-print">
+            <p class="text-xs text-slate-400 font-medium">
+                Designed by <span class="text-slate-600 font-bold">Safwat Khalf Abdel Meguid Mehni</span>
+            </p>
+        </footer>
+    </div>
+
+    <div id="addModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeAddModal()">
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <div
+                class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl pointer-events-auto flex flex-col max-h-[90vh] transform scale-100 transition-all">
+                <div
+                    class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i
+                            class="fa-solid fa-circle-plus text-blue-600"></i> إضافة قضية جديدة</h3>
+                    <button onclick="closeAddModal()" class="text-slate-400 hover:text-red-500 transition"><i
+                            class="fa-solid fa-times fa-lg"></i></button>
+                </div>
+                <div class="p-8 overflow-y-auto custom-scrollbar">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="modalFormContent"></div>
+                </div>
+                <div class="px-6 py-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end gap-3">
+                    <button onclick="closeAddModal()"
+                        class="px-5 py-2.5 border border-slate-300 text-slate-600 rounded-xl hover:bg-white font-medium transition text-sm">إلغاء</button>
+                    <button onclick="saveNewCase()"
+                        class="px-8 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold shadow-md shadow-blue-500/20 transition text-sm flex items-center gap-2"><i
+                            class="fa-regular fa-save"></i> حفظ البيانات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="columnModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeColumnModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl pointer-events-auto flex flex-col max-h-[80vh]">
+                <div
+                    class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-xl">
+                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-table-columns text-blue-600"></i> التحكم
+                        بالأعمدة</h3>
+                    <button onclick="closeColumnModal()" class="text-slate-400 hover:text-red-500"><i
+                            class="fa-solid fa-times"></i></button>
+                </div>
+                <div class="p-4 overflow-y-auto custom-scrollbar flex-grow space-y-2" id="columnCheckboxesContainer">
+                </div>
+                <div class="px-5 py-4 border-t border-slate-100 bg-slate-50 rounded-b-xl flex justify-between gap-3">
+                    <button onclick="toggleAllColumns(true)"
+                        class="text-xs text-blue-600 hover:underline font-bold">تحديد الكل</button>
+                    <button onclick="closeColumnModal()"
+                        class="px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 font-bold text-sm">تطبيق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeUserModal()">
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <div
+                class="bg-white w-full max-w-md rounded-2xl shadow-2xl pointer-events-auto flex flex-col transform scale-100 transition-all">
+                <div
+                    class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i
+                            class="fa-solid fa-users text-purple-600"></i> إدارة المستخدمين</h3>
+                    <button onclick="closeUserModal()" class="text-slate-400 hover:text-red-500 transition"><i
+                            class="fa-solid fa-times fa-lg"></i></button>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">اسم المستخدم الجديد</label>
+                            <input type="text" id="newUsername"
+                                class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">كلمة المرور</label>
+                            <input type="password" id="newPassword"
+                                class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
+                        </div>
+                        <button onclick="createUser()"
+                            class="w-full py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition">إنشاء
+                            الحساب</button>
+                    </div>
+
+                    <div class="mt-6">
+                        <h4 class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">المستخدمين الحاليين
+                        </h4>
+                        <ul id="userList" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="print-only hidden mt-8 text-center border-t pt-4">
+        <p class="font-bold mb-1">تقرير القضايا</p>
+        <p class="text-sm text-gray-500" id="printDate"></p>
+        <p class="text-xs text-gray-400 mt-2">النيابة العامة - نيابة ابوقرقاص الجزئية</p>
+    </div>
+
+    <script>
+        const DEFAULT_HEADERS = ['م', 'رقم الحصر', 'رقم القضية', 'سنة القضية', 'النوع', 'التهمة', 'تاريخ الورود', 'سبب البقاء', 'تاريخ التصرف', 'نوع التصرف', 'العضو المحقق'];
+        let globalData = [];
+        let filteredData = [];
+        let headers = [...DEFAULT_HEADERS];
+        let visibleColumns = [...DEFAULT_HEADERS];
+        const STORAGE_KEY_DATA = 'cases_app_data_custom';
+        const STORAGE_KEY_USERS = 'cases_app_users';
+        const SESSION_KEY_LOGIN = 'cases_app_logged_in';
+
+        // Admin Config
+        const ADMIN_USER = 'esla.m.ali';
+        const ADMIN_PASS = '552014';
+
+        // --- Auth & Init ---
+        window.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus();
+            loadFromStorage();
+            if (globalData.length === 0) renderTable([]);
+            updateDashboard();
+        });
+
+        function checkLoginStatus() {
+            const loggedUser = sessionStorage.getItem(SESSION_KEY_LOGIN);
+            if (loggedUser) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+
+                // إذا كان أدمن أظهر زر المستخدمين
+                if (loggedUser === ADMIN_USER) {
+                    document.getElementById('adminBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('adminBtn').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('loginOverlay').classList.remove('hidden');
+                document.getElementById('mainContent').classList.add('hidden');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+
+            // 1. تحقق من الأدمن
+            if (u === ADMIN_USER && p === ADMIN_PASS) {
+                loginSuccess(u);
+                return;
+            }
+
+            // 2. تحقق من المستخدمين الفرعيين
+            const users = getUsers();
+            const user = users.find(usr => usr.username === u && usr.password === p);
+
+            if (user) {
+                loginSuccess(u);
+            } else {
+                Swal.fire('خطأ', 'اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
+            }
+        }
+
+        function loginSuccess(username) {
+            sessionStorage.setItem(SESSION_KEY_LOGIN, username);
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            checkLoginStatus();
+            const Toast = Swal.mixin({ toast: true, position: 'top-start', showConfirmButton: false, timer: 3000, timerProgressBar: true });
+            Toast.fire({ icon: 'success', title: `مرحباً بك، ${username}` });
+        }
+
+        function logout() {
+            sessionStorage.removeItem(SESSION_KEY_LOGIN);
+            window.location.reload();
+        }
+
+        // --- User Management (Admin Only) ---
+        function getUsers() {
+            const stored = localStorage.getItem(STORAGE_KEY_USERS);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function openUserModal() {
+            const users = getUsers();
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+
+            if (users.length === 0) {
+                list.innerHTML = '<li class="text-xs text-slate-400 text-center py-2">لا يوجد مستخدمين إضافيين</li>';
+            } else {
+                users.forEach((usr, index) => {
+                    const li = document.createElement('li');
+                    li.className = "flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100";
+                    li.innerHTML = `
+                        <span class="text-sm font-bold text-slate-700">${usr.username}</span>
+                        <button onclick="deleteUser(${index})" class="text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i> حذف</button>
+                    `;
+                    list.appendChild(li);
+                });
+            }
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+        }
+
+        function createUser() {
+            const u = document.getElementById('newUsername').value.trim();
+            const p = document.getElementById('newPassword').value.trim();
+
+            if (!u || !p) return Swal.fire('تنبيه', 'يرجى ملء جميع الحقول', 'warning');
+            if (u === ADMIN_USER) return Swal.fire('خطأ', 'لا يمكن استخدام اسم الأدمن', 'error');
+
+            const users = getUsers();
+            if (users.find(usr => usr.username === u)) return Swal.fire('خطأ', 'اسم المستخدم موجود مسبقاً', 'error');
+
+            users.push({ username: u, password: p });
+            localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            openUserModal(); // Refresh list
+            Swal.fire('تم', 'تم إنشاء الحساب بنجاح', 'success');
+        }
+
+        function deleteUser(index) {
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: "سيتم حذف هذا المستخدم",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const users = getUsers();
+                    users.splice(index, 1);
+                    localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+                    openUserModal();
+                    Swal.fire('تم الحذف', '', 'success');
+                }
+            });
+        }
+
+        // --- Data Logic ---
+        document.getElementById('excelInput').addEventListener('change', handleFileSelect, false);
+
+        function saveToStorage() { localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(globalData)); }
+
+        function loadFromStorage() {
+            const savedData = localStorage.getItem(STORAGE_KEY_DATA);
+            if (savedData) {
+                globalData = JSON.parse(savedData);
+                performSearch();
+            } else {
+                renderTable([]);
+            }
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            const dataset = filteredData;
+            const total = dataset.length;
+            const currentYear = new Date().getFullYear();
+
+            document.getElementById('currentYearLabel').innerText = currentYear;
+            const thisYearCount = dataset.filter(row => row['سنة القضية'] == currentYear).length;
+            const disposedCount = dataset.filter(row => {
+                const val = row['نوع التصرف'];
+                return val && String(val).trim() !== "";
+            }).length;
+            const pendingCount = total - disposedCount;
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statCurrentYear').innerText = thisYearCount;
+            document.getElementById('statDisposed').innerText = disposedCount;
+            document.getElementById('statPending').innerText = pendingCount;
+        }
+
+        function backupData() {
+            if (globalData.length === 0) return Swal.fire('تنبيه', 'لا توجد بيانات', 'info');
+            const backupObj = {
+                data: globalData,
+                headers: headers,
+                visibleColumns: visibleColumns,
+                timestamp: new Date().toISOString()
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            const dateStr = new Date().toISOString().split('T')[0];
+            downloadAnchorNode.setAttribute("download", `نسخة_قضايا_${dateStr}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            Swal.fire({ icon: 'success', title: 'تم التحميل', showConfirmButton: false, timer: 1500 });
+        }
+
+        function triggerRestore() { document.getElementById('restoreInput').click(); }
+
+        function handleRestoreFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            if (!file.name.endsWith('.json')) {
+                Swal.fire('خطأ', 'صيغة الملف غير صحيحة', 'error');
+                input.value = ''; return;
+            }
+            Swal.fire({
+                title: 'استعادة', text: "سيتم استبدال البيانات الحالية", icon: 'question',
+                showCancelButton: true, confirmButtonText: 'نعم', cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        try {
+                            const backupObj = JSON.parse(e.target.result);
+                            let newData = [];
+                            if (Array.isArray(backupObj)) newData = backupObj;
+                            else if (backupObj && Array.isArray(backupObj.data)) {
+                                newData = backupObj.data;
+                                if (backupObj.headers) headers = backupObj.headers;
+                                if (backupObj.visibleColumns) visibleColumns = backupObj.visibleColumns;
+                            } else throw new Error("Invalid");
+
+                            if (newData.length > 0) {
+                                globalData = newData;
+                                if (!backupObj.headers) {
+                                    const keys = Object.keys(globalData[0]);
+                                    headers = [...new Set([...DEFAULT_HEADERS, ...keys])];
+                                    visibleColumns = [...headers];
+                                }
+                                saveToStorage(); performSearch(); updateDashboard();
+                                Swal.fire('تمت الاستعادة', '', 'success');
+                            } else Swal.fire('تنبيه', 'الملف فارغ', 'warning');
+                        } catch (error) { Swal.fire('خطأ', 'الملف تالف', 'error'); }
+                    };
+                    reader.readAsText(file);
+                }
+                input.value = '';
+            });
+        }
+
+        function handleFileSelect(evt) {
+            const file = evt.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: false });
+                    if (json.length > 0) {
+                        json.forEach(row => { row['م'] = globalData.length + 1; globalData.push(row); });
+                        saveToStorage(); performSearch(); updateDashboard();
+                        Swal.fire({ icon: 'success', title: 'تم الاستيراد', showConfirmButton: false, timer: 1500 });
+                    }
+                };
+                reader.readAsBinaryString(file);
+            }
+            evt.target.value = '';
+        }
+
+        function resetSystem() {
+            Swal.fire({
+                title: 'حذف الكل؟', text: "لا يمكن التراجع عن هذا الإجراء", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'حذف', cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem(STORAGE_KEY_DATA);
+                    globalData = []; filteredData = [];
+                    renderTable([]); updateStats(); updateDashboard();
+                    Swal.fire('تم الحذف', '', 'success');
+                }
+            })
+        }
+
+        function parseSmartDate(val) {
+            if (!val) return null;
+            if (typeof val === 'number') return new Date(Math.round((val - 25569) * 86400 * 1000));
+            const str = String(val).trim();
+            const parts = str.split(/[\/\-\.]/);
+            if (parts.length === 3) {
+                const p3 = parseInt(parts[2]);
+                if (p3 > 1000) return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+            }
+            const d = new Date(str);
+            return isNaN(d) ? null : d;
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const dateFromStr = document.getElementById('dateFrom').value;
+            const dateToStr = document.getElementById('dateTo').value;
+            const dateCol = 'تاريخ الورود';
+            const dateFrom = dateFromStr ? new Date(dateFromStr) : null;
+            const dateTo = dateToStr ? new Date(dateToStr) : null;
+            if (dateFrom) dateFrom.setHours(0, 0, 0, 0);
+            if (dateTo) dateTo.setHours(0, 0, 0, 0);
+
+            filteredData = globalData.filter(row => {
+                let matchText = true;
+                if (query.trim() !== "") matchText = Object.values(row).some(val => String(val).toLowerCase().includes(query));
+                let matchDate = true;
+                if (dateFrom || dateTo) {
+                    if (!row[dateCol] || String(row[dateCol]).trim() === "") matchDate = false;
+                    else {
+                        const rowDate = parseSmartDate(row[dateCol]);
+                        if (rowDate && !isNaN(rowDate)) {
+                            rowDate.setHours(0, 0, 0, 0);
+                            if (dateFrom && rowDate < dateFrom) matchDate = false;
+                            if (dateTo && rowDate > dateTo) matchDate = false;
+                        } else matchDate = false;
+                    }
+                }
+                return matchText && matchDate;
+            });
+            renderTable(filteredData);
+            updateStats();
+            updateDashboard();
+        }
+
+        function renderTable(data) {
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('tableBody');
+            thead.innerHTML = ''; tbody.innerHTML = '';
+            visibleColumns.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                thead.appendChild(th);
+            });
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${Math.max(1, visibleColumns.length)}" class="text-center py-12 text-slate-400"><div class="flex flex-col items-center gap-2"><i class="fa-regular fa-folder-open fa-3x opacity-50"></i><span>لا توجد بيانات للعرض</span><button onclick="openAddModal()" class="text-sm text-blue-600 hover:underline">إضافة سجل جديد</button></div></td></tr>`;
+                return;
+            }
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-blue-50/50 transition duration-150 group border-b border-slate-50";
+                visibleColumns.forEach(header => {
+                    const td = document.createElement('td');
+                    td.className = "p-3 border-l border-slate-100 last:border-l-0 text-slate-700 whitespace-nowrap";
+                    let val = row[header] || "";
+                    if (header === 'م') {
+                        val = index + 1;
+                        td.innerHTML = `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold font-mono">${val}</span>`;
+                        td.className += " text-center w-12";
+                    } else if (header.includes('حالة') || header.includes('نوع التصرف') || header === 'سبب البقاء') {
+                        val = String(val);
+                        let badgeClass = 'bg-slate-100 text-slate-600';
+                        if (val.includes('حفظ') || val.includes('منتهي') || val.includes('ألا وجه')) badgeClass = 'bg-green-100 text-green-700 border border-green-200';
+                        if (val.includes('تحقيق') || val.includes('جاري') || val.includes('استيفاء')) badgeClass = 'bg-blue-100 text-blue-700 border border-blue-200';
+                        if (val.includes('إحالة') || val.includes('جناية')) badgeClass = 'bg-red-100 text-red-700 border border-red-200';
+                        if (val.trim() !== "") td.innerHTML = `<span class="${badgeClass} px-2 py-1 rounded-md text-xs font-bold shadow-sm">${val}</span>`;
+                        else td.innerHTML = "-";
+                    } else td.textContent = val;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('showingText').innerHTML = `عرض <b>${filteredData.length}</b> من إجمالي <b>${globalData.length}</b> سجل`;
+        }
+
+        function openAddModal() {
+            const container = document.getElementById('modalFormContent');
+            container.innerHTML = '';
+            headers.forEach(h => {
+                if (h === 'م') return;
+                let inputType = 'text';
+                if (h.includes('تاريخ')) inputType = 'date';
+                if (h.includes('سنة')) inputType = 'number';
+                const div = document.createElement('div');
+                div.innerHTML = `<label class="block text-sm font-bold text-slate-700 mb-2">${h}</label><input type="${inputType}" id="in_${h}" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 transition outline-none bg-slate-50 focus:bg-white">`;
+                container.appendChild(div);
+            });
+            const modal = document.getElementById('addModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.firstElementChild.nextElementSibling.classList.remove('scale-95', 'opacity-0'), 10);
+        }
+
+        function closeAddModal() {
+            const modal = document.getElementById('addModal');
+            modal.firstElementChild.nextElementSibling.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function saveNewCase() {
+            const newSeq = globalData.length + 1;
+            const row = { 'م': newSeq };
+            headers.forEach(h => {
+                if (h !== 'م') {
+                    const input = document.getElementById(`in_${h}`);
+                    if (input) row[h] = input.value;
+                }
+            });
+            globalData.push(row);
+            saveToStorage(); performSearch(); updateDashboard(); closeAddModal();
+            Swal.mixin({ toast: true, position: 'top-start', showConfirmButton: false, timer: 3000, timerProgressBar: true }).fire({ icon: 'success', title: 'تم حفظ البيانات بنجاح' });
+        }
+
+        function openColumnModal() {
+            const container = document.getElementById('columnCheckboxesContainer');
+            container.innerHTML = '';
+            headers.forEach(header => {
+                const label = document.createElement('label');
+                label.className = "flex items-center gap-3 p-3 bg-slate-50 hover:bg-blue-50 rounded-lg cursor-pointer transition border border-transparent hover:border-blue-100";
+                const checkbox = document.createElement('input');
+                checkbox.type = "checkbox";
+                checkbox.className = "custom-checkbox";
+                checkbox.value = header;
+                checkbox.checked = visibleColumns.includes(header);
+                checkbox.onchange = function () {
+                    if (this.checked) {
+                        const newVisible = [];
+                        headers.forEach(h => { if (visibleColumns.includes(h) || h === this.value) newVisible.push(h); });
+                        visibleColumns = newVisible;
+                    } else visibleColumns = visibleColumns.filter(col => col !== this.value);
+                    renderTable(filteredData);
+                };
+                label.innerHTML = `<span class="text-sm font-bold text-slate-700">${header}</span>`;
+                label.prepend(checkbox);
+                container.appendChild(label);
+            });
+            document.getElementById('columnModal').classList.remove('hidden');
+        }
+
+        function toggleAllColumns(state) {
+            const checkboxes = document.querySelectorAll('#columnCheckboxesContainer input[type="checkbox"]');
+            checkboxes.forEach(cb => { cb.checked = state; });
+            visibleColumns = state ? [...headers] : [];
+            renderTable(filteredData);
+        }
+        function closeColumnModal() { document.getElementById('columnModal').classList.add('hidden'); }
+
+        function exportToWord() {
+            if (filteredData.length === 0) return Swal.fire('تنبيه', 'لا توجد بيانات', 'warning');
+
+            const headerContent = `
+                <table style="width: 100%; border: none; margin-bottom: 20px;" dir="rtl">
+                    <tr>
+                        <td style="text-align: center; border: none; vertical-align: middle; width: 60%;">
+                            <h2 style="margin: 0; font-size: 18pt; font-weight: bold; font-family: 'Arial';">النيابة العامة</h2>
+                            <h3 style="margin: 5px 0; font-size: 16pt; font-weight: bold; font-family: 'Arial';">نيابة جنوب المنيا الكلية</h3>
+                            <h3 style="margin: 0; font-size: 16pt; font-weight: bold; font-family: 'Arial';">نيابة ابوقرقاص الجزئية</h3>
+                        </td>
+                        <td style="text-align: left; border: none; vertical-align: middle; width: 40%;">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Seal_of_the_Public_Prosecution_in_Egypt.png/120px-Seal_of_the_Public_Prosecution_in_Egypt.png" alt="شعار النيابة" width="100" height="100">
+                        </td>
+                    </tr>
+                </table>
+            `;
+
+            const exportTable = document.createElement('table');
+            exportTable.style.borderCollapse = 'collapse'; exportTable.style.width = '100%'; exportTable.dir = 'rtl';
+            const thead = document.createElement('thead'); const headerRow = document.createElement('tr');
+            visibleColumns.forEach(header => {
+                const th = document.createElement('th');
+                th.innerText = header; th.style.border = '1px solid black'; th.style.padding = '5px'; th.style.backgroundColor = '#5b9bd5'; th.style.color = 'white';
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow); exportTable.appendChild(thead);
+            const tbody = document.createElement('tbody');
+            filteredData.forEach(row => {
+                const tr = document.createElement('tr');
+                visibleColumns.forEach(header => {
+                    const td = document.createElement('td');
+                    td.innerText = row[header] || ''; td.style.border = '1px solid black'; td.style.padding = '5px';
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            exportTable.appendChild(tbody);
+
+            const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export</title><style>body {font-family: Arial;}</style></head><body dir='rtl'>";
+            const postHtml = "</body></html>";
+            const html = preHtml + headerContent + exportTable.outerHTML + postHtml;
+
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+            const downloadLink = document.createElement("a");
+            document.body.appendChild(downloadLink);
+            if (navigator.msSaveOrOpenBlob) { navigator.msSaveOrOpenBlob(blob, 'Cases_Report.doc'); }
+            else { downloadLink.href = url; downloadLink.download = 'Cases_Report.doc'; downloadLink.click(); }
+            document.body.removeChild(downloadLink);
+        }
+
+        function exportToExcel() {
+            if (filteredData.length === 0) return Swal.fire('تنبيه', 'لا توجد بيانات', 'warning');
+            const exportData = filteredData.map(row => {
+                const newRow = {};
+                visibleColumns.forEach(col => newRow[col] = row[col]);
+                return newRow;
+            });
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "القضايا");
+            XLSX.writeFile(wb, "تقرير_القضايا.xlsx");
+        }
+
+        function printTable() {
+            document.getElementById('printDate').innerText = new Date().toLocaleString('ar-EG');
+            window.print();
+        }
+    </script>
+</body>
+
+</html>
